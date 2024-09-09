@@ -1,7 +1,8 @@
-from flask import Flask
+from flask import Flask, request
 import threading
 import time
-import requests  # To trigger a shutdown request to the Flask server
+import os
+import signal
 
 app = Flask(__name__)
 
@@ -9,24 +10,22 @@ app = Flask(__name__)
 def hello():
     return "Hello, Flask inside Docker!"
 
-def shutdown_server():
-    # Send a request to the Flask server to trigger the shutdown
-    requests.get("http://127.0.0.1:5000/shutdown")
-
-@app.route('/shutdown', methods=['GET'])
+@app.route('/shutdown', methods=['POST'])
 def shutdown():
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server')
-    func()
-    return "Server shutting down..."
+    if request.method == 'POST':
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        func()
+        return 'Server shutting down...'
+    return 'Invalid request method!'
 
-def stop_server_after_delay(delay):
-    time.sleep(delay)
-    print("Shutting down the server...")
-    shutdown_server()
+def stop_server_after_delay():
+    time.sleep(30)  # Wait for 30 seconds
+    print("Stopping the server...")
+    os.kill(os.getpid(), signal.SIGINT)  # Send SIGINT to the current process
 
 if __name__ == "__main__":
-    # Start a timer to shut down the server after 120 seconds (2 minutes)
-    threading.Thread(target=stop_server_after_delay, args=(30,)).start()
+    # Start a thread to stop the server after a delay
+    threading.Thread(target=stop_server_after_delay).start()
     app.run(host='0.0.0.0', port=5000)
