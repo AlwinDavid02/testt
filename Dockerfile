@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Install the necessary dependencies
-RUN pip install --no-cache-dir flask
+# Install the necessary dependencies, including Flask and requests
+RUN pip install --no-cache-dir flask requests
 
 # Expose port 5000 for the Flask app
 EXPOSE 5000
