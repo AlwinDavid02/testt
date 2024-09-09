@@ -3,11 +3,16 @@ import threading
 import time
 import os
 import signal
+import logging
 
 app = Flask(__name__)
 
+# Configure logging
+logging.basicConfig(filename='/home/alwin/Documents/projects/test_proj/flask/logs/app.log', level=logging.INFO)
+
 @app.route('/')
 def hello():
+    app.logger.info('Hello endpoint was reached')
     return "Hello, Flask inside Docker!"
 
 @app.route('/shutdown', methods=['POST'])
@@ -22,7 +27,7 @@ def shutdown():
 
 def stop_server_after_delay():
     time.sleep(30)  # Wait for 30 seconds
-    print("Stopping the server...")
+    app.logger.info("Stopping the server...")
     os.kill(os.getpid(), signal.SIGINT)  # Send SIGINT to the current process
 
 if __name__ == "__main__":
