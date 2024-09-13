@@ -8,7 +8,7 @@ import logging
 app = Flask(__name__)
 
 # Configure logging
-logging.basicConfig(filename='/home/alwin/Documents/projects/test_proj/flask/logs/app.log', level=logging.INFO)
+logging.basicConfig(filename='/app/logs/app.log', level=logging.INFO)
 
 @app.route('/')
 def hello():
@@ -26,11 +26,11 @@ def shutdown():
     return 'Invalid request method!'
 
 def stop_server_after_delay():
-    time.sleep(30)  # Wait for 30 seconds
+    time.sleep(3000)  # Wait for 30 seconds
     app.logger.info("Stopping the server...")
     os.kill(os.getpid(), signal.SIGINT)  # Send SIGINT to the current process
 
 if __name__ == "__main__":
     # Start a thread to stop the server after a delay
     threading.Thread(target=stop_server_after_delay).start()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)
